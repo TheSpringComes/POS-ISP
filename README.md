@@ -1,8 +1,19 @@
-# POS-ISP: Pipeline Optimization at the Sequence Level for Task-aware ISP
+# [CVPR 2026 Findings] POS-ISP: Pipeline Optimization at the Sequence Level for Task-aware ISP
 
-**CVPR 2026 Findings**  
-Jiyun Won, Heemin Yang, Woohyeok Kim, Jungseul Ok, Sunghyun Cho  
-POSTECH
+
+
+<p align="center">
+<a href="https://w1jyun.github.io/">Jiyun Won</a><sup>1</sup> &nbsp;&nbsp;
+<a href="https://hmyang0727.github.io/">Heemin Yang</a><sup>1</sup> &nbsp;&nbsp;
+<a href="https://woo525.github.io/">Woohyeok Kim</a><sup>2</sup> &nbsp;&nbsp;
+<a href="https://sites.google.com/view/jungseulok">Jungseul Ok</a><sup>1,2</sup> &nbsp;&nbsp;
+<a href="http://www.scho.pe.kr">Sunghyun Cho</a><sup>1,2</sup>
+</p>
+
+<p align="center">
+POSTECH CSE<sup>1</sup> & GSAI<sup>2</sup>
+</p>
+
 
 ![teaser](overview.jpg)
 
