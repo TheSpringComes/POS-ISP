@@ -4,7 +4,7 @@
 Jiyun Won, Heemin Yang, Woohyeok Kim, Jungseul Ok, Sunghyun Cho  
 POSTECH
 
-![teaser](teaser_posisp.jpg)
+![teaser](overview.jpg)
 
 Official repository for **POS-ISP**, a sequence-level reinforcement learning framework for task-aware ISP optimization.
 
