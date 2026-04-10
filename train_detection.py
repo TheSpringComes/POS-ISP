@@ -146,10 +146,9 @@ class PosISP:
             if self.cfg.use_penalty:
                 reward -= penalty
             param_loss = -torch.mean(reward)
-            if param_loss.requires_grad:
-                param_loss.backward()
-                torch.nn.utils.clip_grad_norm_(self.agent.param_net.parameters(), 1e-4)
-                p_optimizer.step()
+            param_loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.agent.param_net.parameters(), 1e-4)
+            p_optimizer.step()
             mloss_param = (mloss_param * iter_idx + param_loss.item()) / (iter_idx + 1)
             action_loss = torch.mean(surrogate * -reward.detach())
             action_loss.backward()

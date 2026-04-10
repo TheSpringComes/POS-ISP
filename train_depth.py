@@ -88,10 +88,9 @@ class PosISP:
                 retouch_loss_items = self._sup_error_cal(retouch, gts).unsqueeze(1)
                 reward = input_loss_items.detach() - retouch_loss_items
                 param_loss = torch.mean(retouch_loss_items)
-                if param_loss.requires_grad:
-                    param_loss.backward()
-                    torch.nn.utils.clip_grad_norm_(self.agent.param_net.parameters(), 1e-4)
-                    p_optimizer.step()
+                param_loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.agent.param_net.parameters(), 1e-4)
+                p_optimizer.step()
                 action_loss = torch.mean(surrogate * -reward.detach())
                 action_loss.backward()
                 a_optimizer.step()
