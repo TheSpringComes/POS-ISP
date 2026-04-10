@@ -6,7 +6,7 @@ project_root_str = str(PROJECT_ROOT)
 if project_root_str not in sys.path:
     sys.path.insert(0, project_root_str)
 
-from validate_segmentation import main, parse_opt
+from test_segmentation import main, parse_opt
 
 if __name__ == '__main__':
     main(parse_opt())

@@ -341,7 +341,7 @@ def parse_opt():
     parser.add_argument("--save_param", action='store_true', help="save parameter results")
     parser.add_argument("--cfg_file", type=str, default='config', help="config file")
     parser.add_argument('--project', default=PROJECT_ROOT / 'runs', help='save to project/name')
-    parser.add_argument('--name', default='validate_segmentation', help='save to project/name')
+    parser.add_argument('--name', default='test_segmentation', help='save to project/name')
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
 
     opt = parser.parse_args()

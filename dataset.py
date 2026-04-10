@@ -815,9 +815,8 @@ class KITTI(Dataset):
             img = imresize(img, (256,832))
         img_t = toTensor([img])
         bgr = bayer_to_bgr(img_t)
-
-        img = bgr[0]
-
+        img = bgr[:, [2, 1, 0], :, :][0]
+        # img = bgr[0]
         gt = np.load(gt_name).astype(np.float32)
         if gt.ndim == 2:
             gt = gt[None, ...]

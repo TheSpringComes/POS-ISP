@@ -84,7 +84,7 @@ def run(
         save_txt=False,
         save_hybrid=False,
         save_conf=False,
-        save_json=False,
+        save_json=True,
         project=ROOT / 'runs/val',
         name='exp',
         exist_ok=False,
@@ -339,6 +339,34 @@ def run(
         except Exception as e:
             LOGGER.info(f'pycocotools unable to run: {e}')
 
+    if len(jdict):
+        w = Path(weights[0] if isinstance(weights, list) else weights).stem if weights is not None else ''  # weights
+        if not os.path.exists(anno_json):
+            print(data)
+            anno_json = os.path.join(data['path'], 'annotations', f'instances_{task}2017.json')
+        pred_json = str(save_dir / f'{w}_predictions.json')  # predictions
+        LOGGER.info(f'\nEvaluating pycocotools mAP... saving {pred_json}...')
+        with open(pred_json, 'w') as f:
+            json.dump(jdict, f)
+
+        try:  # https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocoEvalDemo.ipynb
+            check_requirements('pycocotools>=2.0.6')
+            from pycocotools.coco import COCO
+            from pycocotools.cocoeval import COCOeval
+
+            anno = COCO(anno_json)  # init annotations api
+            pred = anno.loadRes(pred_json)  # init predictions api
+            eval = COCOeval(anno, pred, 'bbox')
+            if is_coco:
+                eval.params.imgIds = [int(Path(x).stem) for x in dataloader.dataset.im_files]  # image IDs to evaluate
+            eval.evaluate()
+            eval.accumulate()
+            eval.summarize()
+            map, map50 = eval.stats[:2]  # update results (mAP@0.5:0.95, mAP@0.5)
+        except Exception as e:
+            breakpoint()
+            LOGGER.info(f'pycocotools unable to run: {e}')
+            
     model.float()
     if not training:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
@@ -368,7 +396,7 @@ def parse_opt():
     parser.add_argument('--save-conf', action='store_true', help='save confidences in --save-txt labels')
     parser.add_argument('--save-json', action='store_true', help='save a COCO-JSON results file')
     parser.add_argument('--project', default=PROJECT_ROOT / 'runs', help='save to project/name')
-    parser.add_argument('--name', default='validate_detection', help='save to project/name')
+    parser.add_argument('--name', default='test_detection', help='save to project/name')
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
