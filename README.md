@@ -224,14 +224,6 @@ python test_depth.py \
     --save_param
 ```
 
-## Notes
-
-- `test_depth.py` loads the depth backbone from `depth/weight/dispnet_model_best.pth.tar` by default.
-- Test results are saved under the directory specified by `--project` and `--name`.
-- ISP checkpoints are loaded from the `agent_model` key in the saved checkpoint.
-- The paper uses the task names **object detection**, **instance segmentation**, and **monocular depth estimation**.
-- The paper reports results mainly on **LOD-Dark / LOD-All** and **LIS-Dark / LIS-All**.
-
 ## Citation
 
 ```bibtex
