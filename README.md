@@ -60,6 +60,7 @@ Object detection uses:
 
 ```text
 yolov3/data/lod.yaml
+yolov3/data/lod_raw_all.yaml
 ```
 
 Download sources:
@@ -74,6 +75,7 @@ In the paper, the main detection settings are reported on **LOD-Dark** and **LOD
 Instance segmentation uses:
 
 ```text
+yolov3/data/lis_raw_dark.yaml
 yolov3/data/lis_raw_all.yaml
 ```
 
@@ -131,17 +133,34 @@ python train_detection.py \
     --data_name=lod \
     --data_cfg=yolov3/data/lod.yaml \
     --save_dir_name=experiments \
-    --save_path=posisp_det
+    --save_path=posisp_det_lod
 ```
+
+```bash
+python train_detection.py \
+    --data_name=lod \
+    --data_cfg=yolov3/data/lod_raw_all.yaml \
+    --save_dir_name=experiments \
+    --save_path=posisp_det_lod_raw_all
+```
+
 
 ### Instance Segmentation
 
 ```bash
 python train_segmentation.py \
     --data_name=lis \
+    --data_cfg=yolov3/data/lis_raw_dark.yaml \
+    --save_dir_name=experiments \
+    --save_path=posisp_seg_lis_raw_dark
+```
+
+```bash
+python train_segmentation.py \
+    --data_name=lis \
     --data_cfg=yolov3/data/lis_raw_all.yaml \
     --save_dir_name=experiments \
-    --save_path=posisp_seg
+    --save_path=posisp_seg_lis_raw_all
 ```
 
 ### Monocular Depth Estimation
