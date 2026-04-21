@@ -8,7 +8,11 @@ from typing import List, Tuple
 from torch import Tensor
 
 import torchvision
-from torchvision.transforms.functional_tensor import torch_pad # _cast_squeeze_in, _cast_squeeze_out, 
+# torchvision removed `transforms.functional_tensor` in newer versions.
+try:
+    from torchvision.transforms.functional_tensor import torch_pad  # _cast_squeeze_in, _cast_squeeze_out,
+except ModuleNotFoundError:
+    from torchvision.transforms._functional_tensor import torch_pad
 # from torchvision.transforms.functional_tensor import _max_value
 
 

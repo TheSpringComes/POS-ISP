@@ -6,11 +6,16 @@
 # └── datasets
 #     └── coco  ← downloads here (20.1 GB)
 
-# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
-path: /home/w1jyun/CVPR26/Dataset/coco/   # dataset root dir
-train: train2017_raw_5000.txt  # train images (relative to 'path') 128 images
-val: val.txt # val images (relative to 'path') 128 images
-test:  # test images (optional)
+# # Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+# path: /home/w1jyun/CVPR26/Dataset/coco/   # dataset root dir
+# train: train2017_raw_5000.txt  # train images (relative to 'path') 128 images
+# val: val.txt # val images (relative to 'path') 128 images
+# test:  # test images (optional)
+
+path: /home/jing/datasets/coco2017  # dataset root dir
+train: train2017.txt  # train images (relative to 'path') 118287 images
+val: val2017.txt  # val images (relative to 'path') 5000 images
+test: test-dev2017.txt  # 20288 of 40670 images, submit to https://competitions.codalab.org/competitions/20794
 
 # Classes
 names:
