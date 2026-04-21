@@ -3,6 +3,8 @@ import numpy as np
 import torch
 import random
 import os
+import json
+import time
 import hashlib
 import math
 import gzip
@@ -43,6 +45,27 @@ from ultralytics.utils import DEFAULT_CFG
 from ultralytics.data.utils import check_det_dataset
 from path import Path
 from skimage.transform import resize as imresize
+
+_DEBUG_LOG_PATH = "/home/jing/projects/SDI/POS-ISP/.cursor/debug-832f5b.log"
+_DEBUG_SESSION_ID = "832f5b"
+
+
+def _agent_debug_log(hypothesis_id, location, message, data=None, run_id="pre-fix"):
+    try:
+        payload = {
+            "sessionId": _DEBUG_SESSION_ID,
+            "runId": run_id,
+            "hypothesisId": hypothesis_id,
+            "location": location,
+            "message": message,
+            "data": data if data is not None else {},
+            "timestamp": int(time.time() * 1000),
+        }
+        with open(_DEBUG_LOG_PATH, "a", encoding="utf-8") as fp:
+            fp.write(json.dumps(payload, ensure_ascii=False, default=str) + "\n")
+    except Exception:
+        pass
+
 
 class LoadImagesAndLabelsRAWReplaySeg(LoadImagesAndLabels):
     def __init__(self,
@@ -1054,6 +1077,27 @@ class LoadImagesAndLabelsNormalizeReplay(LoadImagesAndLabels):
         self.async_task = None
         self.num_images = len(self.shapes)
 
+        numpy_bridge_smoke_error = None
+        try:
+            _ = torch.from_numpy(np.zeros((1,), dtype=np.float32))
+        except Exception as e:
+            numpy_bridge_smoke_error = f"{type(e).__name__}: {e}"
+        # region agent log
+        _agent_debug_log(
+            "H1",
+            "dataset.py:LoadImagesAndLabelsNormalizeReplay.__init__",
+            "torch-numpy bridge compatibility probe",
+            data={
+                "torch_version": getattr(torch, "__version__", None),
+                "numpy_version": getattr(np, "__version__", None),
+                "numpy_file": getattr(np, "__file__", None),
+                "probe_error": numpy_bridge_smoke_error,
+                "synchronous": bool(self.synchronous),
+                "default_batch_size": int(self.default_batch_size),
+            },
+        )
+        # endregion
+
     def __getitem__(self, index):
 
         hyp = self.hyp
@@ -1110,7 +1154,37 @@ class LoadImagesAndLabelsNormalizeReplay(LoadImagesAndLabels):
 
         labels_out = torch.zeros((nl, 6))
         if nl:
-            labels_out[:, 1:] = torch.from_numpy(labels)
+            # region agent log
+            _agent_debug_log(
+                "H2",
+                "dataset.py:LoadImagesAndLabelsNormalizeReplay.__getitem__",
+                "labels metadata before torch.from_numpy",
+                data={
+                    "index": int(index),
+                    "nl": int(nl),
+                    "labels_type": str(type(labels)),
+                    "labels_dtype": str(getattr(labels, "dtype", None)),
+                    "labels_shape": list(getattr(labels, "shape", [])),
+                    "labels_contiguous": bool(getattr(getattr(labels, "flags", None), "c_contiguous", False)),
+                },
+            )
+            # endregion
+            try:
+                labels_out[:, 1:] = torch.from_numpy(labels)
+            except Exception as e:
+                # region agent log
+                _agent_debug_log(
+                    "H1",
+                    "dataset.py:LoadImagesAndLabelsNormalizeReplay.__getitem__",
+                    "torch.from_numpy(labels) failed",
+                    data={
+                        "index": int(index),
+                        "error_type": type(e).__name__,
+                        "error": str(e),
+                    },
+                )
+                # endregion
+                raise
 
         img = img.transpose((2, 0, 1))[::-1]
         img = np.ascontiguousarray(img) / 255.
@@ -1147,6 +1221,19 @@ class LoadImagesAndLabelsNormalizeReplay(LoadImagesAndLabels):
         return im_list, label_list, path_list, shapes_list
 
     def get_next_batch(self, batch_size):
+        # region agent log
+        _agent_debug_log(
+            "H3",
+            "dataset.py:LoadImagesAndLabelsNormalizeReplay.get_next_batch",
+            "batch dispatch path",
+            data={
+                "requested_batch_size": int(batch_size),
+                "default_batch_size": int(self.default_batch_size),
+                "synchronous": bool(self.synchronous),
+                "has_async_task": bool(self.async_task is not None),
+            },
+        )
+        # endregion
         if self.synchronous or (self.async_task and batch_size != self.default_batch_size):
             return self.get_next_batch_(batch_size)
         else:

@@ -3,7 +3,7 @@ import random
 import numpy as np
 import torch
 
-from dataset import LoadImagesAndLabelsNormalizeReplay, LoadImagesAndLabelsRAWReplaySeg
+from dataset import LoadImagesAndLabelsNormalizeReplay, LoadImagesAndLabelsRAWReplaySeg, _agent_debug_log
 from util import Dict, STATE_STEP_DIM, STATE_STOPPED_DIM
 
 def create_input_tensor(batch):
@@ -154,11 +154,42 @@ class ReplayMemory:
                 prefix=prefix,
                 limit=limit,
             )
+        elif data_name == "coco":
+            self.dataset = LoadImagesAndLabelsNormalizeReplay(
+                path,
+                imgsz,
+                batch_size,
+                augment=augment,
+                hyp=hyp,
+                rect=rect,
+                cache_images=cache,
+                single_cls=single_cls,
+                stride=int(stride),
+                pad=pad,
+                image_weights=image_weights,
+                prefix=prefix,
+                limit=limit,
+            )
         else:
             raise ValueError("ReplayMemory supports only lod.")
         self.image_pool = []
         self.target_pool_size = cfg.replay_memory_size
         self.batch_size = batch_size
+        # region agent log
+        _agent_debug_log(
+            "H5",
+            "replay_memory.py:ReplayMemory.__init__",
+            "runtime package versions in replay memory",
+            data={
+                "torch_version": getattr(torch, "__version__", None),
+                "numpy_version": getattr(np, "__version__", None),
+                "numpy_file": getattr(np, "__file__", None),
+                "load": bool(load),
+                "batch_size": int(batch_size),
+                "target_pool_size": int(self.target_pool_size),
+            },
+        )
+        # endregion
         if load:
             self.load()
 
@@ -174,7 +205,34 @@ class ReplayMemory:
 
     def fill_pool(self):
         while len(self.image_pool) < self.target_pool_size:
-            im_list, label_list, path_list, shapes_list = self.dataset.get_next_batch(self.batch_size)
+            # region agent log
+            _agent_debug_log(
+                "H4",
+                "replay_memory.py:ReplayMemory.fill_pool",
+                "requesting dataset batch for replay pool fill",
+                data={
+                    "current_pool_size": int(len(self.image_pool)),
+                    "target_pool_size": int(self.target_pool_size),
+                    "batch_size": int(self.batch_size),
+                    "dataset_type": type(self.dataset).__name__,
+                },
+            )
+            # endregion
+            try:
+                im_list, label_list, path_list, shapes_list = self.dataset.get_next_batch(self.batch_size)
+            except Exception as e:
+                # region agent log
+                _agent_debug_log(
+                    "H4",
+                    "replay_memory.py:ReplayMemory.fill_pool",
+                    "dataset.get_next_batch raised exception",
+                    data={
+                        "error_type": type(e).__name__,
+                        "error": str(e),
+                    },
+                )
+                # endregion
+                raise
             for i in range(len(im_list)):
                 self.image_pool.append(
                     Dict(

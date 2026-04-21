@@ -182,6 +182,7 @@ class Agent(nn.Module):
         return {
             "output": torch.cat(output, dim=0),
             "selected_prob": selected_prob,
+            "selected_orders": selected_orders,
             "penalty": penalty,
             "early_stop_penalty": early_stop_penalty,
         }

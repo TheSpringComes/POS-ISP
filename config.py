@@ -4,9 +4,9 @@ from isp.filters import *
 cfg = Dict()
 cfg.depth_test_dir = 'Dataset/kitti/KITTI_depth/kitti_depth_test'
 cfg.depth_train_dir = 'Dataset/kitti/KITTI_depth/KITTI_sc'
-cfg.max_iter_step = 20001
+cfg.max_iter_step = 20001 * 10
 cfg.val_freq = 500
-cfg.save_model_freq = 500
+cfg.save_model_freq = 500 * 10
 cfg.print_freq = 100
 cfg.summary_freq = 10
 cfg.show_img_num = 2
